@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-
 import { copy, linkIcon, loader, tick } from "../assets";
 import { useLazyGetSummaryQuery } from "../services/article";
 
@@ -25,8 +24,24 @@ const Demo = () => {
     }
   }, []);
 
+  // Helper function to validate URL
+  const validateUrl = (url) => {
+    try {
+      new URL(url);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate URL before making API call
+    if (!validateUrl(article.url)) {
+      alert("Please enter a valid URL.");
+      return;
+    }
 
     const existingArticle = allArticles.find(
       (item) => item.url === article.url
@@ -34,19 +49,25 @@ const Demo = () => {
 
     if (existingArticle) return setArticle(existingArticle);
 
-    const { data } = await getSummary({ articleUrl: article.url });
-    if (data?.summary) {
-      const newArticle = { ...article, summary: data.summary };
-      const updatedAllArticles = [newArticle, ...allArticles];
+    try {
+      const { data } = await getSummary({ articleUrl: article.url });
+      console.log("API Response:", data);
 
-      // update state and local storage
-      setArticle(newArticle);
-      setAllArticles(updatedAllArticles);
-      localStorage.setItem("articles", JSON.stringify(updatedAllArticles));
+      if (data?.summary) {
+        const newArticle = { ...article, summary: data.summary };
+        const updatedAllArticles = [newArticle, ...allArticles];
+
+        // Update state and local storage
+        setArticle(newArticle);
+        setAllArticles(updatedAllArticles);
+        localStorage.setItem("articles", JSON.stringify(updatedAllArticles));
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching the summary:", error);
     }
   };
 
-  // copy the url and toggle the icon for user feedback
+  // Copy the URL and toggle the icon for user feedback
   const handleCopy = (copyUrl) => {
     setCopied(copyUrl);
     navigator.clipboard.writeText(copyUrl);
@@ -122,7 +143,7 @@ const Demo = () => {
             Well, that wasn't supposed to happen...
             <br />
             <span className='font-satoshi font-normal text-gray-700'>
-              {error?.data?.error}
+              {error?.data?.error || "An unexpected error occurred."}
             </span>
           </p>
         ) : (

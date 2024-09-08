@@ -61,7 +61,9 @@ const Demo = () => {
         setArticle(newArticle);
         setAllArticles(updatedAllArticles);
         localStorage.setItem("articles", JSON.stringify(updatedAllArticles));
-      }
+      } else {
+        console.log("No summary in response:", data);
+      } 
     } catch (error) {
       console.error("An error occurred while fetching the summary:", error);
     }
@@ -143,7 +145,7 @@ const Demo = () => {
             Well, that wasn't supposed to happen...
             <br />
             <span className='font-satoshi font-normal text-gray-700'>
-              {error.data?.error || error?.message || "An unexpected error occurred."}
+              {error?.data?.error || error.message || "An unexpected error occurred."}
             </span>
           </p>
         ) : (

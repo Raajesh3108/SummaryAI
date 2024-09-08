@@ -113,7 +113,7 @@ const Demo = () => {
 
         {/* Browse History */}
         <div className='flex flex-col gap-1 max-h-60 overflow-y-auto'>
-          {allArticles.reverse().map((item, index) => (
+          {allArticles.slice().reverse().map((item, index) => (
             <div
               key={`link-${index}`}
               onClick={() => setArticle(item)}
@@ -143,7 +143,7 @@ const Demo = () => {
             Well, that wasn't supposed to happen...
             <br />
             <span className='font-satoshi font-normal text-gray-700'>
-              {error?.data?.error || "An unexpected error occurred."}
+              {error.data?.error || error?.message || "An unexpected error occurred."}
             </span>
           </p>
         ) : (
